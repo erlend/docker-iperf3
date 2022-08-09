@@ -1,4 +1,4 @@
-variable "VERSION" { default = "3.1.3" }
+variable "VERSION" { default = "3.11" }
 variable "LATEST" { default = false }
 
 group "default" {

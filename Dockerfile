@@ -10,8 +10,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and extract source code
-ARG VERSION=3.1.3
-RUN curl https://iperf.fr/download/source/iperf-$VERSION-source.tar.gz | tar zx
+ARG VERSION=3.11
+RUN curl -L https://github.com/esnet/iperf/archive/refs/tags/$VERSION.tar.gz \
+    | tar zx
 
 # Compile the application
 RUN cd iperf-$VERSION && ./configure --prefix=/usr && make install
