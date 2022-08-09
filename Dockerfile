@@ -1,11 +1,20 @@
-FROM debian:latest AS install
+FROM debian:latest AS build
 
-# Install iperf3
+# Install build dependencies
 RUN apt-get update && \
-    apt-get install --yes --no-install-recommends iperf3 && \
+    apt-get install --yes --no-install-recommends \
+      build-essential \
+      ca-certificates \
+      curl \
+      && \
     rm -rf /var/lib/apt/lists/*
 
-FROM install AS prepare
+# Download and extract source code
+ARG VERSION=3.1.3
+RUN curl https://iperf.fr/download/source/iperf-$VERSION-source.tar.gz | tar zx
+
+# Compile the application
+RUN cd iperf-$VERSION && ./configure --prefix=/usr && make install
 
 # Copy iperf and required libraries to /out
 RUN iperf=$(which iperf3) && \
@@ -17,8 +26,9 @@ RUN iperf=$(which iperf3) && \
     cp "$iperf" /out/ && \
     mkdir --parents --mode=777 /out/tmp
 
+# Create release image
 FROM scratch
-COPY --from=prepare /out /
+COPY --from=build /out /
 
 # Expose server port
 EXPOSE 5201
